@@ -165,5 +165,15 @@
     <script src="js/trigEngine.js"></script>
     <script src="js/circleCanvas.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        // Register Service Worker for offline/serverless capability
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('[SW] Зарегистрирован:', reg.scope))
+                    .catch(err => console.log('[SW] Ошибка регистрации:', err));
+            });
+        }
+    </script>
 </body>
 </html>
