@@ -10,9 +10,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ТригКруг">
     <meta name="theme-color" content="#121214">
-    <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icons/icon-192.png">
-    <link rel="stylesheet" href="css/style.css?v=1.0.2">
+    <link rel="stylesheet" href="css/style.css?v=1.0.3">
 </head>
 <body>
 
@@ -275,19 +274,23 @@
     </div>
 
     <!-- Application Scripts -->
-    <script src="js/trigEngine.js?v=1.0.2"></script>
-    <script src="js/circleCanvas.js?v=1.0.2"></script>
-    <script src="js/app.js?v=1.0.2"></script>
+    <script src="js/trigEngine.js?v=1.0.3"></script>
+    <script src="js/circleCanvas.js?v=1.0.3"></script>
+    <script src="js/app.js?v=1.0.3"></script>
     <script>
-        // Register Service Worker with forced update check
+        // Completely disable offline caching, unregister Service Workers, and clear caches
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=1.0.2')
-                    .then(reg => {
-                        console.log('[SW] Зарегистрирован:', reg.scope);
-                        reg.update();
-                    })
-                    .catch(err => console.log('[SW] Ошибка SW:', err));
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for (var i = 0; i < registrations.length; i++) {
+                    registrations[i].unregister();
+                }
+            });
+        }
+        if ('caches' in window) {
+            caches.keys().then(function(keys) {
+                keys.forEach(function(key) {
+                    caches.delete(key);
+                });
             });
         }
     </script>
