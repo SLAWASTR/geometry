@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Тригонометрический круг — @slawastr 1-26 design</title>
+    
+    <!-- PWA & Mobile Web App Meta -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ТригКруг">
+    <meta name="theme-color" content="#1c1c1e">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Outer Desktop Wallpaper Container / Background Mesh -->
+    <div class="desktop-wallpaper">
+
+        <!-- macOS Native Window Container with Liquid Glass -->
+        <main class="macos-window">
+
+            <!-- Window Titlebar with Traffic Lights -->
+            <header class="window-titlebar">
+                <div class="window-controls">
+                    <button type="button" class="traffic-light close" id="btnTrafficClose" title="Сбросить к 0°"></button>
+                    <button type="button" class="traffic-light minimize" id="btnTrafficMinimize" title="Свернуть"></button>
+                    <button type="button" class="traffic-light maximize" id="btnTrafficMaximize" title="На весь экран"></button>
+                </div>
+
+                <div class="window-title-container">
+                    <div class="window-title-icon">○</div>
+                    <div class="window-title-text">
+                        <span class="app-main-title">Тригонометрический круг</span>
+                        <span class="app-author-chip">автор - @slawastr 1-26 design</span>
+                    </div>
+                </div>
+
+                <div class="window-actions">
+                    <a href="https://github.com/SLAWASTR/geometry/releases/download/v1.0.0/TrigCircle.apk" id="apkDownloadBtn" class="apk-badge-btn" target="_blank" title="Скачать приложение APK для Android">
+                        <span class="apk-icon">📱</span>
+                        <span class="apk-text">APK</span>
+                    </a>
+                    <button type="button" id="themeToggleBtn" class="mac-icon-btn" title="Сменить тему оформления">
+                        <span id="themeIcon">🌓</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Window Content: Adaptive Two-Column / Responsive Layout -->
+            <div class="window-body">
+
+                <!-- Left Column: Input + Interactive Circle + Steppers -->
+                <section class="pane pane-left">
+
+                    <!-- Input Section Card -->
+                    <div class="glass-card input-card">
+                        <!-- Segmented Switcher (Inline vs Textbook Fraction) -->
+                        <div class="macos-segmented" role="tablist">
+                            <button type="button" id="modeInlineBtn" class="seg-btn active" role="tab" aria-selected="true">
+                                <span class="seg-icon">✍️</span> Строка (/)
+                            </button>
+                            <button type="button" id="modeFractionBtn" class="seg-btn" role="tab" aria-selected="false">
+                                <span class="seg-icon">📚</span> Дробь как в учебнике
+                            </button>
+                        </div>
+
+                        <!-- Mode 1: Inline Text Input -->
+                        <div id="inlineContainer" class="input-mode-view">
+                            <div class="inline-input-wrapper">
+                                <span class="input-math-symbol">α =</span>
+                                <input type="text" id="inlineInput" class="inline-math-input" placeholder="например: 3π/4, 13π/6, -16п/3..." value="3π/4" autocomplete="off" spellcheck="false">
+                                <button type="button" id="clearInputBtn" class="mac-clear-btn" title="Очистить поле ввода">✕</button>
+                            </div>
+                            <div class="quick-symbols-toolbar">
+                                <span class="quick-toolbar-label">Быстрый ввод:</span>
+                                <button type="button" class="quick-sym-btn" data-sym="π">π</button>
+                                <button type="button" class="quick-sym-btn" data-sym="/">/</button>
+                                <button type="button" class="quick-sym-btn" data-sym="−">±</button>
+                                <button type="button" class="quick-sym-btn" data-sym="°">°</button>
+                            </div>
+                        </div>
+
+                        <!-- Mode 2: Textbook Fraction Box -->
+                        <div id="fractionContainer" class="input-mode-view hidden">
+                            <div class="fraction-composer">
+                                <button type="button" id="signToggleBtn" class="sign-btn" title="Переключить знак (+/−)">+</button>
+                                <div class="fraction-stack">
+                                    <input type="text" id="numInput" class="frac-cell num-cell" placeholder="3π" value="3π" autocomplete="off" spellcheck="false">
+                                    <div class="fraction-bar"></div>
+                                    <input type="text" id="denInput" class="frac-cell den-cell" placeholder="4" value="4" autocomplete="off" spellcheck="false">
+                                </div>
+                                <div class="frac-actions-sidebar">
+                                    <div class="frac-actions-row">
+                                        <button type="button" id="addPiBtn" class="mini-tool-btn">+π</button>
+                                        <button type="button" id="clearFracBtn" class="mini-tool-btn">Сброс</button>
+                                    </div>
+                                    <div class="denominators-row">
+                                        <button type="button" class="den-chip" data-den="2">/2</button>
+                                        <button type="button" class="den-chip" data-den="3">/3</button>
+                                        <button type="button" class="den-chip" data-den="4">/4</button>
+                                        <button type="button" class="den-chip" data-den="6">/6</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error Banner -->
+                        <div id="errorBanner" class="macos-error-banner hidden">
+                            <span class="err-icon">⚠️</span>
+                            <span id="errorText"></span>
+                        </div>
+
+                        <!-- Examples Carousel / Chips -->
+                        <div class="examples-section">
+                            <div class="examples-header-label">Примеры углов из школьной программы:</div>
+                            <div class="examples-scroll-shelf">
+                                <button type="button" class="example-pill" data-val="3π/4"><span class="pill-rad">3π/4</span> <span class="pill-deg">135°</span></button>
+                                <button type="button" class="example-pill" data-val="13π/6"><span class="pill-rad">13π/6</span> <span class="pill-deg">390°</span></button>
+                                <button type="button" class="example-pill" data-val="5π/3"><span class="pill-rad">5π/3</span> <span class="pill-deg">300°</span></button>
+                                <button type="button" class="example-pill" data-val="17π/6"><span class="pill-rad">17π/6</span> <span class="pill-deg">510°</span></button>
+                                <button type="button" class="example-pill" data-val="-7π/4"><span class="pill-rad">-7π/4</span> <span class="pill-deg">−315°</span></button>
+                                <button type="button" class="example-pill" data-val="-π/6"><span class="pill-rad">-π/6</span> <span class="pill-deg">−30°</span></button>
+                                <button type="button" class="example-pill" data-val="-11π/6"><span class="pill-rad">-11π/6</span> <span class="pill-deg">−330°</span></button>
+                                <button type="button" class="example-pill" data-val="-16π/3"><span class="pill-rad">-16π/3</span> <span class="pill-deg">−960°</span></button>
+                                <button type="button" class="example-pill" data-val="π"><span class="pill-rad">π</span> <span class="pill-deg">180°</span></button>
+                                <button type="button" class="example-pill" data-val="3π/2"><span class="pill-rad">3π/2</span> <span class="pill-deg">270°</span></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Circle Canvas Card -->
+                    <div class="glass-card circle-card">
+                        <div class="circle-stage">
+                            <canvas id="trigCanvas" width="340" height="340"></canvas>
+                        </div>
+
+                        <!-- Exploration Slider & Steppers [-5000° ... +5000°] -->
+                        <div class="angle-explorer-panel">
+                            <div class="slider-row">
+                                <span class="slider-icon">🧭</span>
+                                <input type="range" id="angleSlider" class="macos-range-slider" min="-5000" max="5000" step="5" value="135">
+                                <div id="sliderValueDisplay" class="slider-degree-display">135°</div>
+                            </div>
+
+                            <div class="steppers-toolbar">
+                                <span class="steppers-legend">Шаг оборота:</span>
+                                <div class="stepper-buttons-group">
+                                    <button type="button" id="stepperMinus360" class="mac-stepper-btn">−360°</button>
+                                    <button type="button" id="stepperMinus90" class="mac-stepper-btn">−90°</button>
+                                    <button type="button" id="stepperZero" class="mac-stepper-btn zero-btn">0°</button>
+                                    <button type="button" id="stepperPlus90" class="mac-stepper-btn">+90°</button>
+                                    <button type="button" id="stepperPlus360" class="mac-stepper-btn">+360°</button>
+                                </div>
+                                <span class="range-badge">±5000°</span>
+                            </div>
+                        </div>
+
+                        <!-- Author attribution bottom bar -->
+                        <div class="pane-footer-author">
+                            <span>автор - @slawastr 1-26 design</span>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- Right Column: Metrics + Trigonometric Values + School Explanation -->
+                <section class="pane pane-right">
+
+                    <!-- Key 4 Metrics Cards Grid -->
+                    <div class="metrics-grid">
+                        <div class="glass-card metric-card">
+                            <div class="metric-header">
+                                <span class="metric-icon">📐</span>
+                                <span class="metric-title">Исходный угол</span>
+                            </div>
+                            <div id="metricOriginalDeg" class="metric-primary-val">135°</div>
+                            <div id="metricOriginalRad" class="metric-secondary-val">3π/4 рад</div>
+                        </div>
+
+                        <div class="glass-card metric-card">
+                            <div class="metric-header">
+                                <span class="metric-icon">🔄</span>
+                                <span class="metric-title">Угол на круге [0°, 360°)</span>
+                            </div>
+                            <div id="metricNormDeg" class="metric-primary-val">135°</div>
+                            <div id="metricTurns" class="metric-secondary-val">В пределах 1-го оборота</div>
+                        </div>
+
+                        <div class="glass-card metric-card">
+                            <div class="metric-header">
+                                <span class="metric-icon">📍</span>
+                                <span class="metric-title">Положение / Четверть</span>
+                            </div>
+                            <div id="metricQuadrant" class="metric-primary-val">II четверть</div>
+                            <div id="metricQuadrantBounds" class="metric-secondary-val">Между 90° и 180°</div>
+                        </div>
+
+                        <div class="glass-card metric-card">
+                            <div class="metric-header">
+                                <span class="metric-icon">🎯</span>
+                                <span class="metric-title">Ближайшая засечка</span>
+                            </div>
+                            <div id="metricNearest" class="metric-primary-val">90° и 180°</div>
+                            <div id="metricNearestDist" class="metric-secondary-val">Расстояние: 45°</div>
+                        </div>
+                    </div>
+
+                    <!-- Exact Trigonometric Values Strip -->
+                    <div class="glass-card trig-values-card">
+                        <div class="trig-strip-title">Точные значения тригонометрических функций:</div>
+                        <div class="trig-values-grid">
+                            <div class="trig-val-item">
+                                <span class="fn-name">sin:</span>
+                                <span id="valSin" class="fn-val">√2/2</span>
+                            </div>
+                            <div class="trig-val-item">
+                                <span class="fn-name">cos:</span>
+                                <span id="valCos" class="fn-val">-√2/2</span>
+                            </div>
+                            <div class="trig-val-item">
+                                <span class="fn-name">tg:</span>
+                                <span id="valTan" class="fn-val">-1</span>
+                            </div>
+                            <div class="trig-val-item">
+                                <span class="fn-name">ctg:</span>
+                                <span id="valCot" class="fn-val">-1</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Educational Solution -->
+                    <div class="glass-card solution-card">
+                        <div class="solution-header">
+                            <div class="solution-header-left">
+                                <span class="solution-icon">🎓</span>
+                                <div>
+                                    <h2 class="solution-title">Пошаговое школьное решение</h2>
+                                    <span class="solution-subtitle">Разбор с формулами и пояснениями</span>
+                                </div>
+                            </div>
+                            <button type="button" id="copySolutionBtn" class="mac-action-btn" title="Скопировать всё решение">
+                                <span class="copy-icon">📋</span>
+                                <span id="copyBtnText">Скопировать</span>
+                            </button>
+                        </div>
+
+                        <div id="stepsContainer" class="steps-flow">
+                            <!-- Populated dynamically by app.js -->
+                        </div>
+                    </div>
+
+                    <!-- Mobile Bottom Attribution -->
+                    <div class="mobile-footer-attribution">
+                        <div>автор - @slawastr 1-26 design</div>
+                        <div class="mobile-sub">Тригонометрический круг • Диапазон ±5000°</div>
+                    </div>
+
+                </section>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- Application Logic Scripts -->
+    <script src="js/trigEngine.js"></script>
+    <script src="js/circleCanvas.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Register Service Worker for offline PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('[SW] Зарегистрирован:', reg.scope))
+                    .catch(err => console.log('[SW] Ошибка SW:', err));
+            });
+        }
+    </script>
+</body>
+</html>

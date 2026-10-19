@@ -3,7 +3,7 @@
  * Автор: @slawastr 1-26 design
  */
 
-const CACHE_NAME = 'trig-circle-v1';
+const CACHE_NAME = 'trig-circle-v2';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',

@@ -8,3 +8,9 @@ Icon
 .Trashes
 *.dmg
 *.zip
+*.app
+.gradle/
+build/
+app/build/
+*.apk
+

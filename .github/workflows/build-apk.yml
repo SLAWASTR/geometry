@@ -1,0 +1,61 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Set up Gradle 8.2
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.2'
+
+    - name: Build Debug APK
+      working-directory: ./android
+      run: gradle assembleDebug --stacktrace
+
+    - name: Rename APK for convenience
+      run: |
+        cp android/app/build/outputs/apk/debug/app-debug.apk TrigCircle.apk
+
+    - name: Upload APK to Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: TrigCircle-android-apk
+        path: TrigCircle.apk
+
+    - name: Publish Release with APK
+      uses: softprops/action-gh-release@v2
+      if: github.ref == 'refs/heads/main'
+      with:
+        tag_name: v1.0.0
+        name: "Тригонометрический круг v1.0.0 (Android APK & Web)"
+        body: |
+          📱 Готовый установочный файл приложения «Тригонометрический круг» для Android.
+          Скачайте `TrigCircle.apk` на смартфон и установите в один клик!
+
+          🌐 Онлайн веб-версия (Liquid Glass): https://slawastr.github.io/geometry/
+          🎯 Полное пошаговое школьное решение задач с радианами и градусами.
+          📐 Диапазон углов: ±5000°
+          
+          Автор: @slawastr 1-26 design
+        files: TrigCircle.apk
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

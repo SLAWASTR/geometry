@@ -83,6 +83,23 @@ class TrigEngine {
             .replace(/ /g, '')
             .replace(/,/g, '.');
 
+        // Direct degrees e.g. 135°, -90°, 45град
+        if (s.includes('°') || s.endsWith('град') || s.endsWith('deg')) {
+            let numPart = s.replace(/°/g, '').replace(/град/g, '').replace(/deg/g, '');
+            let degVal = parseFloat(numPart);
+            if (!isNaN(degVal)) {
+                return this.buildResult({
+                    rawInput: input,
+                    hasPi: false,
+                    isFraction: false,
+                    numeratorExact: null,
+                    denominatorExact: null,
+                    radians: (degVal * Math.PI) / 180.0,
+                    degrees: degVal
+                });
+            }
+        }
+
         const hasPi = s.includes('π');
         let numeratorExact = null;
         let denominatorExact = null;

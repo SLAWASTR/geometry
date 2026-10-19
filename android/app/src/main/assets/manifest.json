@@ -1,0 +1,21 @@
+{
+  "name": "Тригонометрический круг",
+  "short_name": "ТригКруг",
+  "description": "Помощник по тригонометрии с тригонометрическим кругом от @slawastr 1-26 design",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#007aff",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
