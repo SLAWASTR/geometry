@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -33,15 +34,27 @@ public class MainActivity extends Activity {
         settings.setDatabaseEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
-        settings.setLoadWithOverviewMode(true);
-        settings.setUseWideViewPort(true);
+
+        // Correct Mobile Viewport & Scaling
+        // DO NOT use setUseWideViewPort(true) or setLoadWithOverviewMode(true)
+        // as they force desktop viewport zooming out on mobile screens!
+        settings.setUseWideViewPort(false);
+        settings.setLoadWithOverviewMode(false);
+        settings.setSupportZoom(false);
+        settings.setBuiltInZoomControls(false);
+        settings.setDisplayZoomControls(false);
+        settings.setTextZoom(100);
+
+        // Performance & Smooth Rendering
+        webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if (url == null) return false;
 
-                // Handle external links (e.g. GitHub releases, Telegram)
+                // Handle external links
                 if (url.startsWith("http://") || url.startsWith("https://")) {
                     if (!url.contains("android_asset")) {
                         try {

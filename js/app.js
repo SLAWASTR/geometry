@@ -12,10 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let fracNegative = false;
     let sliderDegrees = 135.0;
 
-    // DOM Elements - Window Titlebar
-    const btnTrafficClose = document.getElementById('btnTrafficClose');
-    const btnTrafficMinimize = document.getElementById('btnTrafficMinimize');
-    const btnTrafficMaximize = document.getElementById('btnTrafficMaximize');
+    // DOM Elements - Navigation Bar
+    const btnReset = document.getElementById('btnReset');
     const themeToggleBtn = document.getElementById('themeToggleBtn');
     const themeIcon = document.getElementById('themeIcon');
 
@@ -415,26 +413,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (stepperPlus90) stepperPlus90.addEventListener('click', () => updateFromDegrees(sliderDegrees + 90));
     if (stepperPlus360) stepperPlus360.addEventListener('click', () => updateFromDegrees(sliderDegrees + 360));
 
-    // Traffic Light Buttons
-    if (btnTrafficClose) {
-        btnTrafficClose.addEventListener('click', () => {
+    // Reset Button
+    if (btnReset) {
+        btnReset.addEventListener('click', () => {
             updateFromDegrees(0);
         });
     }
-    if (btnTrafficMinimize) {
-        btnTrafficMinimize.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
-    if (btnTrafficMaximize) {
-        btnTrafficMaximize.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen?.().catch(() => {});
-            } else {
-                document.exitFullscreen?.().catch(() => {});
-            }
-        });
-    }
+
 
     // Theme Switcher
     if (themeToggleBtn) {
