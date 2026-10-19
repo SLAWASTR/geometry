@@ -12,7 +12,7 @@
     <meta name="theme-color" content="#121214">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icons/icon-192.png">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=1.0.2">
 </head>
 <body>
 
@@ -275,15 +275,18 @@
     </div>
 
     <!-- Application Scripts -->
-    <script src="js/trigEngine.js"></script>
-    <script src="js/circleCanvas.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/trigEngine.js?v=1.0.2"></script>
+    <script src="js/circleCanvas.js?v=1.0.2"></script>
+    <script src="js/app.js?v=1.0.2"></script>
     <script>
-        // Register Service Worker for offline capability
+        // Register Service Worker with forced update check
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('[SW] Зарегистрирован:', reg.scope))
+                navigator.serviceWorker.register('./sw.js?v=1.0.2')
+                    .then(reg => {
+                        console.log('[SW] Зарегистрирован:', reg.scope);
+                        reg.update();
+                    })
                     .catch(err => console.log('[SW] Ошибка SW:', err));
             });
         }
