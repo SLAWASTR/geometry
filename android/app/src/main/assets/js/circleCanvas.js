@@ -244,13 +244,13 @@ class CircleCanvas {
         ctx.fillStyle = axisColor;
         ctx.fill();
 
-        // Axis Titles
-        ctx.font = 'bold 10.5px system-ui, -apple-system, sans-serif';
+        // Clean Axis Labels (x, y) at arrowtips without colliding with angle labels
+        ctx.font = 'italic 600 12px "Times New Roman", system-ui, -apple-system, serif';
         ctx.fillStyle = axisColor;
         ctx.textAlign = 'right';
-        ctx.fillText('X (cos)', center + axisLength, center + 14);
-        ctx.textAlign = 'left';
-        ctx.fillText('Y (sin)', center + 6, center - axisLength + 9);
+        ctx.fillText('x', center + axisLength - 1, center - 7);
+        ctx.textAlign = 'right';
+        ctx.fillText('y', center - 7, center - axisLength + 10);
 
         // Cardinal Ticks [0°/360°, 90°, 180°, 270°]
         const tickLen = 9;

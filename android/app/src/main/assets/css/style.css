@@ -163,6 +163,37 @@ html, body {
     gap: 6px;
 }
 
+.donate-header-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    background: linear-gradient(135deg, rgba(255, 45, 85, 0.1), rgba(255, 149, 0, 0.1));
+    border: 1px solid rgba(255, 45, 85, 0.28);
+    color: #ff2d55;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(255, 45, 85, 0.12);
+}
+
+[data-theme="dark"] .donate-header-pill {
+    color: #ff375f;
+    border-color: rgba(255, 55, 95, 0.4);
+    background: rgba(255, 55, 95, 0.14);
+}
+
+.donate-header-pill:hover {
+    background: linear-gradient(135deg, rgba(255, 45, 85, 0.18), rgba(255, 149, 0, 0.18));
+    transform: translateY(-0.5px);
+}
+
+.donate-header-pill:active {
+    transform: scale(0.96);
+}
+
 .nav-icon-btn {
     width: 32px;
     height: 32px;
@@ -202,12 +233,13 @@ html, body {
     transform: scale(0.95);
 }
 
-/* Main Content Container (2-column on desktop, single on mobile) */
+/* Main Content Container (Rock-solid for Safari on macOS & Android) */
 .content-container {
     display: grid;
-    grid-template-columns: 1.08fr 0.92fr;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
     gap: 14px;
     align-items: start;
+    width: 100%;
 }
 
 .content-column {
@@ -215,7 +247,90 @@ html, body {
     flex-direction: column;
     gap: 14px;
     min-width: 0;
+    width: 100%;
 }
+
+/* Support Developer Banner Card */
+.donate-card {
+    background: linear-gradient(135deg, rgba(255, 149, 0, 0.08), rgba(255, 45, 85, 0.08)), var(--card-bg);
+    border: 1px solid rgba(255, 149, 0, 0.28);
+    padding: 12px 14px;
+}
+
+.donate-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.donate-badge-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 180px;
+}
+
+.donate-heart {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.donate-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.donate-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.donate-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.35;
+}
+
+.donate-cta-button {
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #ff2d55, #ff9500);
+    color: #ffffff;
+    font-size: 11.5px;
+    font-weight: 700;
+    border-radius: 8px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    box-shadow: 0 2px 8px rgba(255, 45, 85, 0.3);
+    flex-shrink: 0;
+}
+
+.donate-cta-button:hover {
+    opacity: 0.94;
+    transform: translateY(-0.5px);
+}
+
+.donate-cta-button:active {
+    transform: scale(0.96);
+}
+
+.footer-donate-link {
+    color: #ff2d55;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 11px;
+    transition: opacity 0.15s ease;
+}
+
+.footer-donate-link:hover {
+    text-decoration: underline;
+}
+
 
 /* Reusable Clean Card */
 .ui-card {
