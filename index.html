@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Тригонометрический круг — @slawastr 1-26 design</title>
+    
+    <!-- PWA & Mobile Web App Meta -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ТригКруг">
+    <meta name="theme-color" content="#007aff">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="app-icon">○</div>
+            <div>
+                <h1 class="app-title">Тригонометрический круг</h1>
+                <div class="app-author-badge">автор - @slawastr 1-26 design</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Card 1: Input section -->
+    <section class="card">
+        <!-- Segmented Mode Control -->
+        <div class="mode-segmented">
+            <button id="modeInlineBtn" class="seg-btn active">Строка (/)</button>
+            <button id="modeFractionBtn" class="seg-btn">Дробь как в учебнике</button>
+        </div>
+
+        <!-- Mode 1: Inline text -->
+        <div id="inlineContainer">
+            <div class="inline-input-group">
+                <input type="text" id="inlineInput" class="inline-input" placeholder="например: 3π/4, -16п/3..." value="3π/4">
+                <button type="button" id="clearInputBtn" class="clear-btn" title="Очистить">✕</button>
+            </div>
+            <div class="quick-symbols-bar">
+                <button type="button" class="quick-sym-btn" data-sym="π">π</button>
+                <button type="button" class="quick-sym-btn" data-sym="/">/</button>
+                <button type="button" class="quick-sym-btn" data-sym="−">−</button>
+            </div>
+        </div>
+
+        <!-- Mode 2: Textbook Fraction -->
+        <div id="fractionContainer" class="hidden">
+            <div class="fraction-box">
+                <button type="button" id="signToggleBtn" class="sign-toggle-btn">+</button>
+                <div class="fraction-column">
+                    <input type="text" id="numInput" class="frac-input" placeholder="3π" value="3π">
+                    <div class="frac-bar"></div>
+                    <input type="text" id="denInput" class="frac-input" placeholder="4" value="4">
+                </div>
+                <div class="frac-helpers">
+                    <div class="frac-helper-row">
+                        <button type="button" id="addPiBtn" class="small-btn">+π</button>
+                        <button type="button" id="clearFracBtn" class="small-btn">Очистить</button>
+                    </div>
+                    <div class="frac-helper-row">
+                        <button type="button" class="den-chip" data-den="2">/2</button>
+                        <button type="button" class="den-chip" data-den="3">/3</button>
+                        <button type="button" class="den-chip" data-den="4">/4</button>
+                        <button type="button" class="den-chip" data-den="6">/6</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Banner -->
+        <div id="errorBanner" class="error-banner hidden">
+            <span>⚠️</span>
+            <span id="errorText"></span>
+        </div>
+
+        <!-- Examples Horizontal Scroll -->
+        <div style="margin-top: 14px;">
+            <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">
+                Примеры углов (нажмите для решения):
+            </div>
+            <div class="examples-scroll">
+                <button type="button" class="example-chip" data-val="3π/4">3π/4 <span class="sub">135°</span></button>
+                <button type="button" class="example-chip" data-val="13π/6">13π/6 <span class="sub">390°</span></button>
+                <button type="button" class="example-chip" data-val="5π/3">5π/3 <span class="sub">300°</span></button>
+                <button type="button" class="example-chip" data-val="17π/6">17π/6 <span class="sub">510°</span></button>
+                <button type="button" class="example-chip" data-val="-7π/4">-7π/4 <span class="sub">−315°</span></button>
+                <button type="button" class="example-chip" data-val="-π/6">-π/6 <span class="sub">−30°</span></button>
+                <button type="button" class="example-chip" data-val="-11π/6">-11π/6 <span class="sub">−330°</span></button>
+                <button type="button" class="example-chip" data-val="-16π/3">-16π/3 <span class="sub">−960°</span></button>
+                <button type="button" class="example-chip" data-val="π">π <span class="sub">180°</span></button>
+                <button type="button" class="example-chip" data-val="3π/2">3π/2 <span class="sub">270°</span></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Card 2: Interactive Trigonometric Circle -->
+    <section class="card">
+        <div class="canvas-wrapper">
+            <canvas id="trigCanvas" width="320" height="320"></canvas>
+        </div>
+
+        <!-- Slider and Steppers [-5000° ... +5000°] -->
+        <div class="slider-container">
+            <div class="slider-row">
+                <input type="range" id="angleSlider" class="range-slider" min="-5000" max="5000" step="5" value="135">
+                <div id="sliderValueDisplay" class="slider-val-badge">135°</div>
+            </div>
+            <div class="steppers-row">
+                <button type="button" id="stepperMinus360" class="stepper-btn">−360°</button>
+                <button type="button" id="stepperMinus90" class="stepper-btn">−90°</button>
+                <button type="button" id="stepperZero" class="stepper-btn">0°</button>
+                <button type="button" id="stepperPlus90" class="stepper-btn">+90°</button>
+                <button type="button" id="stepperPlus360" class="stepper-btn">+360°</button>
+                <span class="range-indicator">±5000°</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Metrics Cards Grid -->
+    <section class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-title">Исходный угол</div>
+            <div id="metricOriginalDeg" class="metric-val">135°</div>
+            <div id="metricOriginalRad" class="metric-sub">3π/4 рад</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Угол на круге [0°, 360°)</div>
+            <div id="metricNormDeg" class="metric-val">135°</div>
+            <div id="metricTurns" class="metric-sub">В пределах 1-го оборота</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Положение на плоскости</div>
+            <div id="metricQuadrant" class="metric-val">II четверть</div>
+            <div id="metricQuadrantBounds" class="metric-sub">Между 90° и 180°</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-title">Ближайшая засечка</div>
+            <div id="metricNearest" class="metric-val">90° и 180°</div>
+            <div id="metricNearestDist" class="metric-sub">Расстояние: 45°</div>
+        </div>
+    </section>
+
+    <!-- Step-by-Step Educational Solution -->
+    <section class="card">
+        <div class="steps-header">
+            <h2 class="steps-title">Пошаговое решение</h2>
+            <button type="button" id="copySolutionBtn" class="copy-btn">Скопировать</button>
+        </div>
+        <div id="stepsContainer">
+            <!-- Dynamic step cards -->
+        </div>
+    </section>
+
+    <!-- Footer Attribution -->
+    <footer class="app-footer">
+        <div>автор - @slawastr 1-26 design</div>
+        <div style="font-size: 11px; margin-top: 4px; opacity: 0.8;">Тригонометрический круг • Диапазон ±5000°</div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/trigEngine.js"></script>
+    <script src="js/circleCanvas.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
