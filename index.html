@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-title" content="ТригКруг">
     <meta name="theme-color" content="#121214">
     <link rel="icon" type="image/png" href="icons/icon-192.png">
-    <link rel="stylesheet" href="css/style.css?v=1.0.3">
+    <link rel="stylesheet" href="css/style.css?v=1.0.4">
 </head>
 <body>
 
@@ -58,7 +58,10 @@
                             Строка (/)
                         </button>
                         <button type="button" id="modeFractionBtn" class="segment-btn" role="tab" aria-selected="false">
-                            Дробь как в учебнике
+                            Дробь
+                        </button>
+                        <button type="button" id="modeSeriesBtn" class="segment-btn" role="tab" aria-selected="false">
+                            Серия α (k ∈ ℤ)
                         </button>
                     </div>
 
@@ -98,6 +101,75 @@
                                     <button type="button" class="den-chip" data-den="4">/4</button>
                                     <button type="button" class="den-chip" data-den="6">/6</button>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode 3: Series with Alpha (Задание №6) -->
+                    <div id="seriesContainer" class="input-pane hidden">
+                        <!-- Tasks from textbook / photo -->
+                        <div class="series-tasks-shelf">
+                            <div class="shelf-label">Задание №6 (из учебника):</div>
+                            <div class="series-tasks-grid">
+                                <button type="button" class="series-task-pill active" data-series="-α + 2πn, n ∈ Z">
+                                    <span class="task-badge">1</span> <b>-α + 2πn</b> <span class="task-param">n ∈ ℤ</span>
+                                </button>
+                                <button type="button" class="series-task-pill" data-series="α + πl, l ∈ Z">
+                                    <span class="task-badge">2</span> <b>α + πl</b> <span class="task-param">l ∈ ℤ</span>
+                                </button>
+                                <button type="button" class="series-task-pill" data-series="α + π/2 * k, k ∈ Z">
+                                    <span class="task-badge">3</span> <b>α + π/2·k</b> <span class="task-param">k ∈ ℤ</span>
+                                </button>
+                                <button type="button" class="series-task-pill" data-series="-α + π/4 * n, n ∈ Z">
+                                    <span class="task-badge">4</span> <b>-α + π/4·n</b> <span class="task-param">n ∈ ℤ</span>
+                                </button>
+                            </div>
+                            <div class="series-tasks-more">
+                                <button type="button" class="mini-task-chip" data-series="α + 2πk, k ∈ Z">α + 2πk</button>
+                                <button type="button" class="mini-task-chip" data-series="-α + πk, k ∈ Z">-α + πk</button>
+                                <button type="button" class="mini-task-chip" data-series="π - α + 2πk, k ∈ Z">π - α + 2πk</button>
+                                <button type="button" class="mini-task-chip" data-series="π/2 - α + 2πk, k ∈ Z">π/2 - α + 2πk</button>
+                            </div>
+                        </div>
+
+                        <!-- Math Input for Series -->
+                        <div class="math-input-box" style="margin-top: 10px;">
+                            <span class="math-prefix">Серия:</span>
+                            <input type="text" id="seriesInput" class="math-input-field" placeholder="например: -α + 2πn, n ∈ Z" value="-α + 2πn, n ∈ Z" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            <button type="button" id="clearSeriesBtn" class="input-clear-btn" title="Очистить">✕</button>
+                        </div>
+
+                        <!-- Quick symbols for series -->
+                        <div class="quick-symbols-bar">
+                            <span class="quick-label">Вставка:</span>
+                            <button type="button" class="quick-series-sym" data-sym="α">α</button>
+                            <button type="button" class="quick-series-sym" data-sym="π">π</button>
+                            <button type="button" class="quick-series-sym" data-sym="+">+</button>
+                            <button type="button" class="quick-series-sym" data-sym="-">−</button>
+                            <button type="button" class="quick-series-sym" data-sym="/">/</button>
+                            <button type="button" class="quick-series-sym" data-sym="n">n</button>
+                            <button type="button" class="quick-series-sym" data-sym="k">k</button>
+                            <button type="button" class="quick-series-sym" data-sym="l">l</button>
+                            <button type="button" class="quick-series-sym" data-sym=", n ∈ ℤ">, n ∈ ℤ</button>
+                        </div>
+
+                        <!-- Reference Alpha Angle Control -->
+                        <div class="alpha-control-box">
+                            <div class="alpha-control-header">
+                                <span class="alpha-label">Опорный угол <b>α</b> (I четверть):</span>
+                                <span id="alphaValueDisplay" class="alpha-badge">35°</span>
+                            </div>
+                            <div class="alpha-slider-row">
+                                <input type="range" id="alphaSlider" class="app-range-slider" min="15" max="75" step="1" value="35">
+                                <button type="button" id="toggleAlphaRefBtn" class="alpha-toggle-btn active" title="Показывать опорный луч α на круге">
+                                    Луч α
+                                </button>
+                            </div>
+                            <div class="alpha-quick-picks">
+                                <button type="button" class="alpha-chip" data-deg="30">30°</button>
+                                <button type="button" class="alpha-chip active" data-deg="35">35°</button>
+                                <button type="button" class="alpha-chip" data-deg="45">45°</button>
+                                <button type="button" class="alpha-chip" data-deg="60">60°</button>
                             </div>
                         </div>
                     </div>
@@ -175,67 +247,132 @@
                     </div>
                 </section>
 
-                <!-- 3. Key Metrics Cards (2x2 Grid) -->
-                <section class="metrics-grid">
-                    <div class="ui-card metric-item">
-                        <div class="metric-top">
-                            <span class="metric-emoji">📐</span>
-                            <span class="metric-label">Исходный угол</span>
+                <!-- 3A. Single Angle Mode Metrics -->
+                <div id="standardMetricsSection">
+                    <section class="metrics-grid">
+                        <div class="ui-card metric-item">
+                            <div class="metric-top">
+                                <span class="metric-emoji">📐</span>
+                                <span class="metric-label">Исходный угол</span>
+                            </div>
+                            <div id="metricOriginalDeg" class="metric-main">135°</div>
+                            <div id="metricOriginalRad" class="metric-desc">3π/4 рад</div>
                         </div>
-                        <div id="metricOriginalDeg" class="metric-main">135°</div>
-                        <div id="metricOriginalRad" class="metric-desc">3π/4 рад</div>
-                    </div>
 
-                    <div class="ui-card metric-item">
-                        <div class="metric-top">
-                            <span class="metric-emoji">🔄</span>
-                            <span class="metric-label">На круге [0°, 360°)</span>
+                        <div class="ui-card metric-item">
+                            <div class="metric-top">
+                                <span class="metric-emoji">🔄</span>
+                                <span class="metric-label">На круге [0°, 360°)</span>
+                            </div>
+                            <div id="metricNormDeg" class="metric-main">135°</div>
+                            <div id="metricTurns" class="metric-desc">В пределах 1-го оборота</div>
                         </div>
-                        <div id="metricNormDeg" class="metric-main">135°</div>
-                        <div id="metricTurns" class="metric-desc">В пределах 1-го оборота</div>
-                    </div>
 
-                    <div class="ui-card metric-item">
-                        <div class="metric-top">
-                            <span class="metric-emoji">📍</span>
-                            <span class="metric-label">Положение / Четверть</span>
+                        <div class="ui-card metric-item">
+                            <div class="metric-top">
+                                <span class="metric-emoji">📍</span>
+                                <span class="metric-label">Положение / Четверть</span>
+                            </div>
+                            <div id="metricQuadrant" class="metric-main">II четверть</div>
+                            <div id="metricQuadrantBounds" class="metric-desc">Между 90° и 180°</div>
                         </div>
-                        <div id="metricQuadrant" class="metric-main">II четверть</div>
-                        <div id="metricQuadrantBounds" class="metric-desc">Между 90° и 180°</div>
-                    </div>
 
-                    <div class="ui-card metric-item">
-                        <div class="metric-top">
-                            <span class="metric-emoji">🎯</span>
-                            <span class="metric-label">Ближайшая засечка</span>
+                        <div class="ui-card metric-item">
+                            <div class="metric-top">
+                                <span class="metric-emoji">🎯</span>
+                                <span class="metric-label">Ближайшая засечка</span>
+                            </div>
+                            <div id="metricNearest" class="metric-main">90° и 180°</div>
+                            <div id="metricNearestDist" class="metric-desc">Расстояние: 45°</div>
                         </div>
-                        <div id="metricNearest" class="metric-main">90° и 180°</div>
-                        <div id="metricNearestDist" class="metric-desc">Расстояние: 45°</div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- 4. Exact Trigonometric Values Strip -->
-                <section class="ui-card trig-functions-strip">
-                    <div class="strip-header">Точные значения функций:</div>
-                    <div class="functions-row">
-                        <div class="function-box">
-                            <span class="fn-tag">sin:</span>
-                            <span id="valSin" class="fn-value">√2/2</span>
+                    <!-- Exact Trigonometric Values Strip -->
+                    <section class="ui-card trig-functions-strip">
+                        <div class="strip-header">Точные значения функций:</div>
+                        <div class="functions-row">
+                            <div class="function-box">
+                                <span class="fn-tag">sin:</span>
+                                <span id="valSin" class="fn-value">√2/2</span>
+                            </div>
+                            <div class="function-box">
+                                <span class="fn-tag">cos:</span>
+                                <span id="valCos" class="fn-value">-√2/2</span>
+                            </div>
+                            <div class="function-box">
+                                <span class="fn-tag">tg:</span>
+                                <span id="valTan" class="fn-value">-1</span>
+                            </div>
+                            <div class="function-box">
+                                <span class="fn-tag">ctg:</span>
+                                <span id="valCot" class="fn-value">-1</span>
+                            </div>
                         </div>
-                        <div class="function-box">
-                            <span class="fn-tag">cos:</span>
-                            <span id="valCos" class="fn-value">-√2/2</span>
+                    </section>
+                </div>
+
+                <!-- 3B. Series with Alpha Mode Metrics (Задание №6) -->
+                <div id="seriesMetricsSection" class="hidden">
+                    <!-- Hero Quadrants Badge Card -->
+                    <section class="ui-card series-hero-card">
+                        <div class="series-hero-header">
+                            <span class="series-hero-emoji">🎯</span>
+                            <span class="series-hero-tag">Ответ задания (четверть):</span>
                         </div>
-                        <div class="function-box">
-                            <span class="fn-tag">tg:</span>
-                            <span id="valTan" class="fn-value">-1</span>
+                        <div id="seriesQuadTitle" class="series-hero-title">IV четверть</div>
+                        <div id="seriesQuadSub" class="series-hero-sub">1 точка на окружности • полный период 2π</div>
+                    </section>
+
+                    <!-- Series Parameters Grid (2x2) -->
+                    <section class="metrics-grid">
+                        <div class="ui-card metric-item">
+                            <div class="metric-top">
+                                <span class="metric-emoji">📌</span>
+                                <span class="metric-label">Базовый угол</span>
+                            </div>
+                            <div id="seriesBaseAngle" class="metric-main">-α</div>
+                            <div id="seriesBaseAngleDesc" class="metric-desc">По часовой стрелке</div>
                         </div>
-                        <div class="function-box">
-                            <span class="fn-tag">ctg:</span>
-                            <span id="valCot" class="fn-value">-1</span>
+
+                        <div class="ui-card metric-item">
+                            <div class="metric-top">
+                                <span class="metric-emoji">🔄</span>
+                                <span class="metric-label">Период (шаг)</span>
+                            </div>
+                            <div id="seriesPeriod" class="metric-main">2π (360°)</div>
+                            <div id="seriesPeriodDesc" class="metric-desc">Полный оборот</div>
                         </div>
-                    </div>
-                </section>
+
+                        <div class="ui-card metric-item">
+                            <div class="metric-top">
+                                <span class="metric-emoji">🔢</span>
+                                <span class="metric-label">Параметр</span>
+                            </div>
+                            <div id="seriesParam" class="metric-main">n ∈ ℤ</div>
+                            <div class="metric-desc">Любое целое число</div>
+                        </div>
+
+                        <div class="ui-card metric-item">
+                            <div class="metric-top">
+                                <span class="metric-emoji">📍</span>
+                                <span class="metric-label">Число точек</span>
+                            </div>
+                            <div id="seriesNumPoints" class="metric-main">1 точка</div>
+                            <div class="metric-desc">На единичном круге</div>
+                        </div>
+                    </section>
+
+                    <!-- Points Table Card -->
+                    <section class="ui-card series-points-card">
+                        <div class="series-points-header">
+                            <span>Положения лучей на круге:</span>
+                            <span id="seriesPointsCountBadge" class="points-badge">1 точка</span>
+                        </div>
+                        <div id="seriesPointsList" class="series-points-list">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </section>
+                </div>
 
                 <!-- 5. Step-by-Step Educational Solution -->
                 <section class="ui-card solution-section">
@@ -274,9 +411,9 @@
     </div>
 
     <!-- Application Scripts -->
-    <script src="js/trigEngine.js?v=1.0.3"></script>
-    <script src="js/circleCanvas.js?v=1.0.3"></script>
-    <script src="js/app.js?v=1.0.3"></script>
+    <script src="js/trigEngine.js?v=1.0.4"></script>
+    <script src="js/circleCanvas.js?v=1.0.4"></script>
+    <script src="js/app.js?v=1.0.4"></script>
     <script>
         // Completely disable offline caching, unregister Service Workers, and clear caches
         if ('serviceWorker' in navigator) {

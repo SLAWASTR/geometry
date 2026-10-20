@@ -986,6 +986,345 @@ html, body {
 }
 
 /* ==========================================================================
+   Series with Alpha (Задание №6) Styles
+   ========================================================================== */
+
+.series-tasks-shelf {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.series-tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.series-task-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 10px;
+    font-size: 12px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+}
+
+.series-task-pill:hover {
+    border-color: var(--accent-blue);
+    background: var(--card-bg-hover);
+    transform: translateY(-0.5px);
+}
+
+.series-task-pill.active {
+    border-color: var(--accent-blue);
+    background: var(--accent-blue-subtle);
+    color: var(--accent-blue);
+    box-shadow: 0 1px 4px rgba(0, 113, 227, 0.15);
+}
+
+.task-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: var(--accent-blue);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.series-task-pill.active .task-badge {
+    background: var(--accent-blue);
+}
+
+.task-param {
+    font-size: 10.5px;
+    color: var(--text-secondary);
+    margin-left: auto;
+}
+
+.series-tasks-more {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.mini-task-chip {
+    padding: 4px 8px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.12s ease;
+}
+
+.mini-task-chip:hover {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+}
+
+.mini-task-chip.active {
+    border-color: var(--accent-blue);
+    background: var(--accent-blue-subtle);
+    color: var(--accent-blue);
+    font-weight: 600;
+}
+
+.quick-series-sym {
+    padding: 3px 8px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.12s ease;
+}
+
+.quick-series-sym:hover {
+    background: var(--accent-blue-subtle);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+/* Reference Alpha Angle Control Box */
+.alpha-control-box {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.alpha-control-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.alpha-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.alpha-label b {
+    color: var(--accent-blue);
+    font-family: "Times New Roman", serif;
+    font-style: italic;
+    font-size: 13.5px;
+}
+
+.alpha-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-blue);
+    background: var(--accent-blue-subtle);
+    padding: 2px 7px;
+    border-radius: 6px;
+}
+
+.alpha-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alpha-toggle-btn {
+    padding: 5px 9px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.alpha-toggle-btn.active {
+    background: var(--accent-blue-subtle);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+.alpha-quick-picks {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.alpha-chip {
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.12s ease;
+}
+
+.alpha-chip:hover {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+}
+
+.alpha-chip.active {
+    background: var(--accent-blue);
+    color: #ffffff;
+    border-color: var(--accent-blue);
+}
+
+/* Series Hero Card */
+.series-hero-card {
+    background: linear-gradient(135deg, rgba(10, 132, 255, 0.12), rgba(94, 92, 230, 0.1)), var(--card-bg);
+    border: 1.5px solid rgba(10, 132, 255, 0.35);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.series-hero-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.series-hero-emoji {
+    font-size: 18px;
+}
+
+.series-hero-tag {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent-blue);
+}
+
+.series-hero-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+    margin-top: 2px;
+}
+
+.series-hero-sub {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+}
+
+/* Series Points List Table Card */
+.series-points-card {
+    padding: 12px 14px;
+}
+
+.series-points-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.points-badge {
+    font-size: 10.5px;
+    padding: 2px 6px;
+    background: var(--accent-blue-subtle);
+    color: var(--accent-blue);
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.series-points-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.point-row-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 12px;
+    transition: background 0.12s ease;
+}
+
+.point-row-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.point-row-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.point-row-param {
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-size: 11px;
+    min-width: 32px;
+}
+
+.point-row-expr {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.point-row-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.point-row-angle {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.point-row-quad {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    background: var(--card-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 5px;
+    color: var(--text-primary);
+}
+
+/* ==========================================================================
    Responsive Adaptations
    ========================================================================== */
 @media (max-width: 820px) {

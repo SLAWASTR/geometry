@@ -481,6 +481,295 @@ class TrigEngine {
 
         return steps;
     }
+
+    // ==========================================
+    // СЕРИИ УГЛОВ С ПАРАМЕТРОМ α (Задание №6)
+    // ==========================================
+
+    static isSeriesExpression(raw) {
+        if (!raw) return false;
+        const str = raw.trim().toLowerCase();
+        if (str.includes('α') || str.includes('alpha') || str.includes('альфа')) return true;
+        if (str.includes('∈') || str.includes('in z') || str.includes('∈z') || str.includes('∈ z')) return true;
+        if (/(^|[^a-zа-я0-9_])[aа]([^a-zа-я0-9_]|$)/i.test(str) && (str.includes('π') || str.includes('pi') || str.includes('п'))) return true;
+        if (/π\s*[\*]?\s*[nklm]/i.test(str) || /[nklm]\s*[\*]?\s*π/i.test(str)) return true;
+        return false;
+    }
+
+    static calculateSeries(rawInput, alphaDeg = 35) {
+        const trimmed = (rawInput || '').trim();
+        if (!trimmed) {
+            return this.emptySeriesResult();
+        }
+
+        let s = trimmed
+            .replace(/,\s*[a-zA-Zа-яА-Я]\s*(∈|in|\u2208)\s*(Z|ℤ)/gi, '')
+            .replace(/−/g, '-')
+            .replace(/ПИ/gi, 'π').replace(/Пи/gi, 'π').replace(/пи/gi, 'π')
+            .replace(/П/gi, 'π').replace(/п/gi, 'π').replace(/pi/gi, 'π').replace(/PI/gi, 'π')
+            .replace(/альфа/gi, 'α').replace(/alpha/gi, 'α')
+            .replace(/(^|[^a-zA-Zа-яА-Я0-9_])([aа])([^a-zA-Zа-яА-Я0-9_]|$)/g, '$1α$3')
+            .replace(/\s+/g, '');
+
+        // Parameter variable (n, l, k, m)
+        let varMatch = s.match(/[nklm]/i);
+        let paramVar = varMatch ? varMatch[0].toLowerCase() : 'k';
+
+        // Alpha presence and sign
+        let hasAlpha = s.includes('α');
+        let alphaSign = 0;
+        if (hasAlpha) {
+            let idx = s.indexOf('α');
+            if (idx > 0 && s[idx - 1] === '-') {
+                alphaSign = -1;
+            } else {
+                alphaSign = 1;
+            }
+        }
+
+        // Offset (e.g. π - α, π/2 - α, 3π/2 - α)
+        let offsetDeg = 0;
+        let offsetExpr = '';
+        if (s.includes('π/2-α') || s.includes('π/2+α') || s.includes('90°-α')) {
+            offsetDeg = 90;
+            offsetExpr = 'π/2';
+        } else if (s.includes('3π/2-α') || s.includes('3π/2+α') || s.includes('270°-α')) {
+            offsetDeg = 270;
+            offsetExpr = '3π/2';
+        } else if (s.includes('π-α') || s.includes('π+α') || s.includes('180°-α')) {
+            offsetDeg = 180;
+            offsetExpr = 'π';
+        }
+
+        // Detect period
+        let cleanPeriod = s.replace(/^[+-]?α/, '').replace(/[+-]α/, '');
+        if (offsetExpr) {
+            cleanPeriod = cleanPeriod.replace(offsetExpr, '');
+        }
+        cleanPeriod = cleanPeriod.replace(/^\+/, '').replace(/\+$/, '');
+
+        let periodDeg = 360;
+        let periodExpr = '2π';
+
+        if (cleanPeriod.includes('π/4') || cleanPeriod.includes('(π/4)') || cleanPeriod.includes('π' + paramVar + '/4') || cleanPeriod.includes('45°')) {
+            periodDeg = 45;
+            periodExpr = 'π/4';
+        } else if (cleanPeriod.includes('π/2') || cleanPeriod.includes('(π/2)') || cleanPeriod.includes('π' + paramVar + '/2') || cleanPeriod.includes('90°')) {
+            periodDeg = 90;
+            periodExpr = 'π/2';
+        } else if (cleanPeriod.includes('2π/3') || cleanPeriod.includes('(2π/3)') || cleanPeriod.includes('2π' + paramVar + '/3') || cleanPeriod.includes('120°')) {
+            periodDeg = 120;
+            periodExpr = '2π/3';
+        } else if (cleanPeriod.includes('π/3') || cleanPeriod.includes('(π/3)') || cleanPeriod.includes('π' + paramVar + '/3') || cleanPeriod.includes('60°')) {
+            periodDeg = 60;
+            periodExpr = 'π/3';
+        } else if (cleanPeriod.includes('π/6') || cleanPeriod.includes('(π/6)') || cleanPeriod.includes('π' + paramVar + '/6') || cleanPeriod.includes('30°')) {
+            periodDeg = 30;
+            periodExpr = 'π/6';
+        } else if (cleanPeriod.includes('3π/4') || cleanPeriod.includes('(3π/4)') || cleanPeriod.includes('135°')) {
+            periodDeg = 135;
+            periodExpr = '3π/4';
+        } else if (cleanPeriod.includes('2π') || cleanPeriod.includes('2*π') || cleanPeriod.includes('360°')) {
+            periodDeg = 360;
+            periodExpr = '2π';
+        } else if (cleanPeriod.includes('π') || cleanPeriod.includes('180°')) {
+            periodDeg = 180;
+            periodExpr = 'π';
+        }
+
+        const numPoints = Math.round(360 / periodDeg);
+        const points = [];
+        const quadrantsSet = new Set();
+
+        const baseAngleName = alphaSign === -1 ? '-α' : (alphaSign === 1 ? 'α' : (offsetExpr || '0'));
+        const fullBaseExpr = offsetExpr ? (alphaSign === -1 ? `${offsetExpr} - α` : `${offsetExpr} + α`) : baseAngleName;
+
+        for (let i = 0; i < numPoints; i++) {
+            let deg = (offsetDeg + alphaSign * alphaDeg + i * periodDeg) % 360;
+            if (deg < 0) deg += 360;
+            deg = Math.round(deg * 10) / 10;
+
+            let quad = '';
+            if (deg > 0 && deg < 90) quad = 'I';
+            else if (deg > 90 && deg < 180) quad = 'II';
+            else if (deg > 180 && deg < 270) quad = 'III';
+            else if (deg > 270 && deg < 360) quad = 'IV';
+            else quad = 'на оси';
+
+            if (quad !== 'на оси') quadrantsSet.add(quad);
+
+            // Symbolic step label
+            let symLabel = '';
+            if (i === 0) {
+                symLabel = fullBaseExpr;
+            } else {
+                let stepPart = '';
+                if (periodExpr === '2π') stepPart = `2π`;
+                else if (periodExpr === 'π') stepPart = (i === 1 ? 'π' : `${i}π`);
+                else if (periodExpr === 'π/2') {
+                    if (i === 1) stepPart = 'π/2';
+                    else if (i === 2) stepPart = 'π';
+                    else if (i === 3) stepPart = '3π/2';
+                } else if (periodExpr === 'π/4') {
+                    const fractions = ['', 'π/4', 'π/2', '3π/4', 'π', '5π/4', '3π/2', '7π/4'];
+                    stepPart = fractions[i] || `${i}π/4`;
+                } else {
+                    stepPart = `${i} · ${periodExpr}`;
+                }
+                symLabel = fullBaseExpr !== '0' ? `${fullBaseExpr} + ${stepPart}` : stepPart;
+            }
+
+            const rad = (deg * Math.PI) / 180.0;
+            points.push({
+                k: i,
+                degrees: deg,
+                radians: rad,
+                quadrant: quad,
+                label: symLabel,
+                x: Math.cos(rad),
+                y: Math.sin(rad)
+            });
+        }
+
+        const order = ['I', 'II', 'III', 'IV'];
+        const sortedQuads = order.filter(q => quadrantsSet.has(q));
+        let quadTitle = '';
+        if (sortedQuads.length === 1) {
+            quadTitle = `${sortedQuads[0]} четверть`;
+        } else if (sortedQuads.length === 2) {
+            quadTitle = `${sortedQuads[0]} и ${sortedQuads[1]} четверти`;
+        } else if (sortedQuads.length === 4) {
+            quadTitle = `I, II, III, IV четверти (все четверти)`;
+        } else if (sortedQuads.length === 3) {
+            quadTitle = sortedQuads.join(', ') + ' четверти';
+        } else {
+            quadTitle = 'на осях';
+        }
+
+        // Generate school-ready pedagogical explanation steps
+        const steps = [];
+        let stepNum = 1;
+
+        // Step 1: Base angle analysis
+        let s1Expl = '';
+        if (alphaSign === -1 && !offsetExpr) {
+            s1Expl = `Базовый угол: -α.\nПо определению, угол α считается произвольным острым углом первой четверти (0° < α < 90°).\nЗнак «минус» перед α означает поворот по часовой стрелке (в отрицательном направлении) от положительного направления оси OX.\nСледовательно, луч угла -α попадает в IV четверть.`;
+        } else if (alphaSign === 1 && !offsetExpr) {
+            s1Expl = `Базовый угол: α.\nУгол α — острый угол первой четверти (0° < α < 90°).\nОткладывается от положительного направления оси OX против часовой стрелки и находится в I четверти.`;
+        } else if (offsetExpr) {
+            s1Expl = `Базовое выражение: ${fullBaseExpr}.\nПри остром угле α ∈ (0°, 90°) выражение ${fullBaseExpr} попадает в ${points[0].quadrant} четверть.`;
+        } else {
+            s1Expl = `Базовый угол: 0° (совпадает с положительной полуосью OX).`;
+        }
+
+        steps.push({
+            stepNumber: stepNum++,
+            title: '1. Анализ базового угла',
+            summary: `Угол: ${fullBaseExpr}`,
+            formula: `${fullBaseExpr} при 0° < α < 90°`,
+            explanation: s1Expl
+        });
+
+        // Step 2: Period analysis
+        let s2Expl = `Слагаемое с переменной: ${periodExpr}${paramVar} (${paramVar} ∈ ℤ).\n`;
+        s2Expl += `• Период серии равен T = ${periodExpr} (${periodDeg}°).\n`;
+        s2Expl += `• Переменная ${paramVar} принимает любые целые значения: ..., -2, -1, 0, 1, 2, ...\n`;
+        if (periodDeg === 360) {
+            s2Expl += `• Прибавление 2π${paramVar} (360° · ${paramVar}) означает полный оборот вокруг начала координат. После любого целого числа полных оборотов луч возвращается в ту же самую точку круга.`;
+        } else {
+            s2Expl += `• За один полный оборот (2π = 360°) умещается: 360° / ${periodDeg}° = ${numPoints} шагов.\n`;
+            s2Expl += `• Следовательно, на тригонометрическом круге получается ровно ${numPoints} ${numPoints === 1 ? 'точка' : (numPoints < 5 ? 'точки' : 'точек')}.`;
+        }
+
+        steps.push({
+            stepNumber: stepNum++,
+            title: '2. Анализ периода и шага',
+            summary: `Период: ${periodExpr} (${periodDeg}°), точек: ${numPoints}`,
+            formula: `T = ${periodExpr}, ${paramVar} ∈ ℤ`,
+            explanation: s2Expl
+        });
+
+        // Step 3: Distinct values table
+        let s3Expl = `Перебираем значения параметра ${paramVar} от 0 до ${numPoints - 1} для получения всех различных положений на круге:\n\n`;
+        for (const pt of points) {
+            s3Expl += `• При ${paramVar} = ${pt.k}: ${pt.label} (при α = ${alphaDeg}° ≈ ${pt.degrees}°) ➔ ${pt.quadrant} четверть\n`;
+        }
+        if (numPoints > 1) {
+            s3Expl += `\nПри ${paramVar} = ${numPoints}: значение повторяет точку при ${paramVar} = 0 (круг замыкается).`;
+        }
+
+        steps.push({
+            stepNumber: stepNum++,
+            title: `3. Точки на круге (${numPoints})`,
+            summary: `${numPoints} ${numPoints === 1 ? 'положение' : 'положения'} луча`,
+            formula: null,
+            explanation: s3Expl
+        });
+
+        // Step 4: Final Conclusion
+        let s4Expl = `Итоговые четверти для серии ${trimmed}:\n`;
+        s4Expl += `Все точки серии попадают в: ${quadTitle}.`;
+
+        steps.push({
+            stepNumber: stepNum++,
+            title: '4. Итоговый ответ',
+            summary: quadTitle,
+            formula: `Ответ: ${quadTitle}`,
+            explanation: s4Expl
+        });
+
+        // Plain text solution for copying
+        let copyText = `Задание: Изобразите значения на тригонометрическом круге и укажите их четверть:\n`;
+        copyText += `${trimmed}\n\n`;
+        copyText += `Решение:\n`;
+        copyText += `1. Базовый угол: ${fullBaseExpr}. Так как α — острый угол (0° < α < 90°), то базовое положение луча попадает в ${points[0].quadrant} четверть.\n`;
+        copyText += `2. Период серии: T = ${periodExpr} (${periodDeg}°). Число различных точек на круге: 360° / ${periodDeg}° = ${numPoints}.\n`;
+        copyText += `3. Положения лучей при ${paramVar} ∈ ℤ:\n`;
+        for (const pt of points) {
+            copyText += `   • ${paramVar} = ${pt.k}: ${pt.label} — ${pt.quadrant} четверть\n`;
+        }
+        copyText += `\nОтвет: ${quadTitle}.`;
+
+        return {
+            isValid: true,
+            isSeries: true,
+            rawInput: trimmed,
+            paramVar,
+            alphaDeg,
+            alphaSign,
+            offsetDeg,
+            offsetExpr,
+            periodExpr,
+            periodDeg,
+            numPoints,
+            points,
+            quadrants: sortedQuads,
+            quadTitle,
+            steps,
+            fullSolutionText: copyText
+        };
+    }
+
+    static emptySeriesResult() {
+        return {
+            isValid: false,
+            isSeries: true,
+            rawInput: '',
+            paramVar: 'k',
+            alphaDeg: 35,
+            alphaSign: 1,
+            offsetDeg: 0,
+            offsetExpr: '',
+            periodExpr: '2π',
+            periodDeg: 360,
+            numPoints: 1,
+            points: [],
+            quadrants: [],
+            quadTitle: '—',
+            steps: [],
+            fullSolutionText: ''
+        };
+    }
 }
 
 if (typeof module !== 'undefined' && module.exports) {

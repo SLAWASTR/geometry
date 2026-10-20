@@ -8,6 +8,8 @@ class CircleCanvas {
         this.canvas = canvasElement;
         this.ctx = canvasElement.getContext('2d');
         this.onAngleChange = onAngleChange;
+        this.onAlphaChange = null;
+        this.showAlphaReference = true;
         this.isDragging = false;
         this.result = null;
         this.logicalSize = 320;
@@ -58,7 +60,15 @@ class CircleCanvas {
         const handleStart = (e) => {
             this.isDragging = true;
             const deg = getAngleFromEvent(e);
-            this.onAngleChange?.(deg);
+            if (this.result && this.result.isSeries) {
+                let alpha = deg;
+                if (alpha > 180) alpha = 360 - alpha;
+                if (alpha > 90) alpha = 180 - alpha;
+                alpha = Math.max(10, Math.min(80, Math.round(alpha)));
+                this.onAlphaChange?.(alpha);
+            } else {
+                this.onAngleChange?.(deg);
+            }
             if (e.cancelable && e.type.startsWith('touch')) {
                 e.preventDefault();
             }
@@ -67,7 +77,15 @@ class CircleCanvas {
         const handleMove = (e) => {
             if (!this.isDragging) return;
             const deg = getAngleFromEvent(e);
-            this.onAngleChange?.(deg);
+            if (this.result && this.result.isSeries) {
+                let alpha = deg;
+                if (alpha > 180) alpha = 360 - alpha;
+                if (alpha > 90) alpha = 180 - alpha;
+                alpha = Math.max(10, Math.min(80, Math.round(alpha)));
+                this.onAlphaChange?.(alpha);
+            } else {
+                this.onAngleChange?.(deg);
+            }
             if (e.cancelable && e.type.startsWith('touch')) {
                 e.preventDefault();
             }
@@ -108,8 +126,18 @@ class CircleCanvas {
         ctx.clearRect(0, 0, size, size);
 
         // 1. Shaded Quadrant Highlight (calm soft background)
-        if (this.result && this.result.isValid && !this.result.quadrant.isAxis) {
-            this.drawQuadrantHighlight(ctx, center, radius, this.result.quadrant.number, isDark);
+        if (this.result && this.result.isValid) {
+            if (this.result.isSeries && this.result.quadrants) {
+                const romanMap = { 'I': 1, 'II': 2, 'III': 3, 'IV': 4 };
+                for (const qStr of this.result.quadrants) {
+                    const qNum = romanMap[qStr];
+                    if (qNum) {
+                        this.drawQuadrantHighlight(ctx, center, radius, qNum, isDark);
+                    }
+                }
+            } else if (this.result.quadrant && !this.result.quadrant.isAxis) {
+                this.drawQuadrantHighlight(ctx, center, radius, this.result.quadrant.number, isDark);
+            }
         }
 
         // 2. Unit Circle
@@ -130,14 +158,18 @@ class CircleCanvas {
 
         if (!this.result || !this.result.isValid) return;
 
-        // 6. Rotation Arc or Archimedean Spiral
-        this.drawRotationArcOrSpiral(ctx, center, radius, this.result.degrees, isDark);
+        if (this.result.isSeries) {
+            this.drawSeriesRays(ctx, center, radius, this.result, isDark);
+        } else {
+            // 6. Rotation Arc or Archimedean Spiral
+            this.drawRotationArcOrSpiral(ctx, center, radius, this.result.degrees, isDark);
 
-        // 7. Projections to Axes (cos, sin)
-        this.drawProjections(ctx, center, radius, this.result.normalizedDegrees, isDark);
+            // 7. Projections to Axes (cos, sin)
+            this.drawProjections(ctx, center, radius, this.result.normalizedDegrees, isDark);
 
-        // 8. Terminal Ray (Contrasting orange with glowing endpoint)
-        this.drawTerminalRay(ctx, center, radius, this.result.normalizedDegrees);
+            // 8. Terminal Ray (Contrasting orange with glowing endpoint)
+            this.drawTerminalRay(ctx, center, radius, this.result.normalizedDegrees);
+        }
     }
 
     drawQuadrantWatermarks(ctx, center, radius, isDark) {
@@ -472,6 +504,145 @@ class CircleCanvas {
         ctx.fill();
 
         ctx.restore();
+    }
+
+    drawSeriesRays(ctx, center, radius, seriesResult, isDark) {
+        if (!seriesResult || !seriesResult.points) return;
+
+        // 1. Reference Angle α (Dashed Ray & Arc in Quadrant I)
+        const alphaDeg = seriesResult.alphaDeg || 35;
+        const alphaRad = (alphaDeg * Math.PI) / 180.0;
+
+        if (this.showAlphaReference !== false && seriesResult.alphaSign !== 0) {
+            ctx.save();
+            // Dashed reference ray in Quadrant I
+            ctx.beginPath();
+            ctx.setLineDash([5, 4]);
+            ctx.moveTo(center, center);
+            ctx.lineTo(center + radius * Math.cos(alphaRad), center - radius * Math.sin(alphaRad));
+            ctx.strokeStyle = isDark ? 'rgba(10, 132, 255, 0.75)' : 'rgba(0, 113, 227, 0.75)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Reference arc for α
+            const arcRadius = Math.min(radius * 0.38, 42);
+            ctx.setLineDash([]);
+            ctx.beginPath();
+            ctx.arc(center, center, arcRadius, 0, -alphaRad, true);
+            ctx.strokeStyle = isDark ? '#2997ff' : '#0071e3';
+            ctx.lineWidth = 1.8;
+            ctx.stroke();
+
+            // Label α
+            const midAlpha = alphaRad / 2;
+            const labelDist = arcRadius + 14;
+            ctx.font = 'italic 700 15px "Times New Roman", Georgia, serif';
+            ctx.fillStyle = isDark ? '#5ac8fa' : '#0071e3';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('α', center + labelDist * Math.cos(midAlpha), center - labelDist * Math.sin(midAlpha));
+            ctx.restore();
+        }
+
+        // 2. Draw each point and ray in the series
+        const points = seriesResult.points;
+        const colors = [
+            '#ff9500', // vibrant orange
+            '#ff2d55', // pink-red
+            '#30d158', // green
+            '#af52de', // purple
+            '#5856d6', // indigo
+            '#00c7be', // teal
+            '#ffd60a', // yellow
+            '#ff3b30'  // red
+        ];
+
+        points.forEach((pt, idx) => {
+            const rad = pt.radians;
+            const color = colors[idx % colors.length];
+
+            ctx.save();
+            // Ray from origin
+            ctx.beginPath();
+            ctx.moveTo(center, center);
+            const ptX = center + radius * Math.cos(rad);
+            const ptY = center - radius * Math.sin(rad);
+            ctx.lineTo(ptX, ptY);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.4;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            // Outer halo
+            ctx.beginPath();
+            ctx.arc(ptX, ptY, 7.5, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.28;
+            ctx.fill();
+
+            // Solid marker
+            ctx.globalAlpha = 1.0;
+            ctx.beginPath();
+            ctx.arc(ptX, ptY, 4.5, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            // White center dot
+            ctx.beginPath();
+            ctx.arc(ptX, ptY, 1.8, 0, 2 * Math.PI);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+
+            // Label text around circumference
+            const labelR = radius + (points.length > 4 ? 14 : 20);
+            const lblX = center + labelR * Math.cos(rad);
+            const lblY = center - labelR * Math.sin(rad);
+
+            ctx.font = '600 11.5px -apple-system, system-ui, sans-serif';
+            ctx.fillStyle = isDark ? '#f5f5f7' : '#1d1d1f';
+
+            if (Math.abs(Math.cos(rad)) < 0.25) {
+                ctx.textAlign = 'center';
+                ctx.textBaseline = Math.sin(rad) > 0 ? 'bottom' : 'top';
+            } else {
+                ctx.textAlign = Math.cos(rad) > 0 ? 'left' : 'right';
+                ctx.textBaseline = 'middle';
+            }
+
+            let displayText = pt.label;
+            if (points.length >= 8) {
+                displayText = `${seriesResult.paramVar}=${pt.k}`;
+            }
+            ctx.fillText(displayText, lblX, lblY);
+            ctx.restore();
+        });
+
+        // 3. For single point series with negative alpha (e.g. -α + 2πn): draw directional rotation arc
+        if (points.length === 1 && seriesResult.alphaSign === -1) {
+            ctx.save();
+            const arcR = Math.min(radius * 0.44, 46);
+            ctx.beginPath();
+            ctx.arc(center, center, arcR, 0, alphaRad, false);
+            ctx.strokeStyle = '#ff9500';
+            ctx.lineWidth = 1.8;
+            ctx.stroke();
+
+            const arrowX = center + arcR * Math.cos(alphaRad);
+            const arrowY = center + arcR * Math.sin(alphaRad);
+            ctx.fillStyle = '#ff9500';
+            ctx.beginPath();
+            ctx.arc(arrowX, arrowY, 3, 0, 2 * Math.PI);
+            ctx.fill();
+
+            const midA = alphaRad / 2;
+            const lblR = arcR + 13;
+            ctx.font = 'italic 700 13px "Times New Roman", serif';
+            ctx.fillStyle = '#ff9500';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('-α', center + lblR * Math.cos(midA), center + lblR * Math.sin(midA));
+            ctx.restore();
+        }
     }
 }
 
