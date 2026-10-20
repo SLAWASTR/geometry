@@ -211,6 +211,7 @@ class TrigEngine {
             nearestTicks: [360],
             distanceToNearestTick: 0,
             trigValues: this.computeTrigValues(0),
+            parity: this.computeParityInfo(0, this.computeTrigValues(0)),
             steps: []
         };
     }
@@ -295,6 +296,9 @@ class TrigEngine {
         // Exact Trigonometry
         const trigValues = this.computeTrigValues(norm);
 
+        // Parity of Trig Functions
+        const parity = this.computeParityInfo(degrees, trigValues);
+
         // Educational Steps
         const steps = this.generateSteps({
             rawInput,
@@ -309,7 +313,8 @@ class TrigEngine {
             nearestTicks,
             minDist: minDistance,
             nearestSummary,
-            trig: trigValues
+            trig: trigValues,
+            parity
         });
 
         return {
@@ -330,6 +335,7 @@ class TrigEngine {
             nearestTicks,
             distanceToNearestTick: minDistance,
             trigValues,
+            parity,
             steps
         };
     }
@@ -383,7 +389,66 @@ class TrigEngine {
         };
     }
 
-    static generateSteps({ hasPi, num, den, radians, degrees, norm, turns, quadrant, nearestTicks, minDist, nearestSummary, trig }) {
+    static computeParityInfo(degrees, trigValues) {
+        const degStr = this.formatDegree(degrees).replace(/^-/, '−');
+        const negDeg = -degrees;
+        const negDegStr = this.formatDegree(negDeg).replace(/^-/, '−');
+
+        const normNeg = ((negDeg % 360.0) + 360.0) % 360.0;
+        const negTrig = this.computeTrigValues(normNeg);
+
+        let cosCalc = '';
+        let sinCalc = '';
+        let tanCalc = '';
+        let cotCalc = '';
+
+        if (Math.abs(degrees) < 1e-5) {
+            cosCalc = `cos(−0°) = cos(0°) = 1`;
+            sinCalc = `sin(−0°) = −sin(0°) = 0`;
+            tanCalc = `tg(−0°) = −tg(0°) = 0`;
+            cotCalc = `ctg(−0°): не существует`;
+        } else if (degrees < 0) {
+            // Negative angle input e.g. -135° -> -x is +135°
+            cosCalc = `cos(${degStr}) = cos(${negDegStr}) = ${trigValues.cosExact}`;
+            sinCalc = `sin(${degStr}) = −sin(${negDegStr}) = ${trigValues.sinExact}`;
+            if (trigValues.tanExact === 'не сущ.' || trigValues.tanExact === 'не существует') {
+                tanCalc = `tg(${degStr}): не существует`;
+            } else {
+                tanCalc = `tg(${degStr}) = −tg(${negDegStr}) = ${trigValues.tanExact}`;
+            }
+            if (trigValues.cotExact === 'не сущ.' || trigValues.cotExact === 'не существует') {
+                cotCalc = `ctg(${degStr}): не существует`;
+            } else {
+                cotCalc = `ctg(${degStr}) = −ctg(${negDegStr}) = ${trigValues.cotExact}`;
+            }
+        } else {
+            // Positive angle input e.g. 135° -> -x is -135°
+            cosCalc = `cos(−${degStr}) = cos(${degStr}) = ${trigValues.cosExact}`;
+            sinCalc = `sin(−${degStr}) = −sin(${degStr}) = ${negTrig.sinExact}`;
+            if (trigValues.tanExact === 'не сущ.' || trigValues.tanExact === 'не существует') {
+                tanCalc = `tg(−${degStr}): не существует`;
+            } else {
+                tanCalc = `tg(−${degStr}) = −tg(${degStr}) = ${negTrig.tanExact}`;
+            }
+            if (trigValues.cotExact === 'не сущ.' || trigValues.cotExact === 'не существует') {
+                cotCalc = `ctg(−${degStr}): не существует`;
+            } else {
+                cotCalc = `ctg(−${degStr}) = −ctg(${degStr}) = ${negTrig.cotExact}`;
+            }
+        }
+
+        return {
+            degStr,
+            negDegStr,
+            cosCalc,
+            sinCalc,
+            tanCalc,
+            cotCalc,
+            negTrig
+        };
+    }
+
+    static generateSteps({ hasPi, num, den, radians, degrees, norm, turns, quadrant, nearestTicks, minDist, nearestSummary, trig, parity }) {
         const steps = [];
         let stepNum = 1;
 
@@ -444,6 +509,26 @@ class TrigEngine {
             explanation: s2Explanation
         });
 
+        // PARITY STEP FOR NEGATIVE ANGLES
+        if (degrees < 0 && parity) {
+            steps.push({
+                stepNumber: stepNum++,
+                title: 'Чётность тригонометрических функций',
+                summary: 'cos(−x) = cos(x), sin(−x) = −sin(x)',
+                formula: 'cos(−x) = cos(x) | sin(−x) = −sin(x) | tg(−x) = −tg(x) | ctg(−x) = −ctg(x)',
+                explanation: `Так как исходный угол отрицательный (${degStr} < 0°), применяем фундаментальные свойства чётности функций:\n` +
+                    `1. Косинус — ЧЁТНАЯ функция: знак «минус» уничтожается (поглощается):\n` +
+                    `   ${parity.cosCalc}\n` +
+                    `2. Синус — НЕЧЁТНАЯ функция: знак «минус» выносится вперед:\n` +
+                    `   ${parity.sinCalc}\n` +
+                    `3. Тангенс — НЕЧЁТНАЯ функция: знак «минус» выносится вперед:\n` +
+                    `   ${parity.tanCalc}\n` +
+                    `4. Котангенс — НЕЧЁТНАЯ функция: знак «минус» выносится вперед:\n` +
+                    `   ${parity.cotCalc}\n\n` +
+                    `Геометрически: на единичной окружности точка ${degStr} симметрична точке ${parity.negDegStr} относительно горизонтальной оси Ox (одинаковая абсцисса x = cos, противоположные ординаты y = ±sin).`
+            });
+        }
+
         // STEP 3: Quadrant
         let s3Explanation = '';
         if (quadrant.isAxis) {
@@ -486,13 +571,18 @@ class TrigEngine {
             explanation: s4Explanation
         });
 
-        // STEP 5: Coordinates
+        // STEP 5: Coordinates & Parity
+        let s5Explanation = `Координаты точки на единичной окружности:\n• x = cos(${normStr}) = ${trig.cosExact}\n• y = sin(${normStr}) = ${trig.sinExact}\n• tg(${normStr}) = ${trig.tanExact}\n• ctg(${normStr}) = ${trig.cotExact}`;
+        if (parity) {
+            s5Explanation += `\n\nСвойства чётности тригонометрических функций:\n• ${parity.cosCalc} (чётная • поглощает минус)\n• ${parity.sinCalc} (нечётная • выносит минус)\n• ${parity.tanCalc} (нечётная • выносит минус)\n• ${parity.cotCalc} (нечётная • выносит минус)`;
+        }
+
         steps.push({
             stepNumber: stepNum++,
-            title: 'Точные тригонометрические значения',
+            title: 'Точные значения и чётность функций',
             summary: `sin = ${trig.sinExact}, cos = ${trig.cosExact}`,
             formula: 'x = cos(α), y = sin(α)',
-            explanation: `Координаты точки на единичной окружности:\n• x = cos(${normStr}) = ${trig.cosExact}\n• y = sin(${normStr}) = ${trig.sinExact}\n• tg(${normStr}) = ${trig.tanExact}\n• ctg(${normStr}) = ${trig.cotExact}`
+            explanation: s5Explanation
         });
 
         return steps;

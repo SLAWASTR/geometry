@@ -89,6 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const valTan = document.getElementById('valTan');
     const valCot = document.getElementById('valCot');
 
+    // DOM Elements - Parity
+    const parityCosCalc = document.getElementById('parityCosCalc');
+    const paritySinCalc = document.getElementById('paritySinCalc');
+    const parityTanCalc = document.getElementById('parityTanCalc');
+    const parityCotCalc = document.getElementById('parityCotCalc');
+    const toggleParityMirrorBtn = document.getElementById('toggleParityMirrorBtn');
+
     // DOM Elements - Steps & Copy
     const stepsContainer = document.getElementById('stepsContainer');
     const copySolutionBtn = document.getElementById('copySolutionBtn');
@@ -134,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         renderMetrics(result);
         renderTrigStrip(result);
+        renderParity(result);
         renderSteps(result);
 
         if (result.isValid) {
@@ -287,6 +295,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (valCos) valCos.textContent = res.trigValues.cosExact;
         if (valTan) valTan.textContent = res.trigValues.tanExact;
         if (valCot) valCot.textContent = res.trigValues.cotExact;
+    }
+
+    // Render Parity of Trig Functions
+    function renderParity(res) {
+        if (!res || !res.isValid || !res.parity) {
+            if (parityCosCalc) parityCosCalc.textContent = '—';
+            if (paritySinCalc) paritySinCalc.textContent = '—';
+            if (parityTanCalc) parityTanCalc.textContent = '—';
+            if (parityCotCalc) parityCotCalc.textContent = '—';
+            return;
+        }
+        if (parityCosCalc) parityCosCalc.textContent = res.parity.cosCalc;
+        if (paritySinCalc) paritySinCalc.textContent = res.parity.sinCalc;
+        if (parityTanCalc) parityTanCalc.textContent = res.parity.tanCalc;
+        if (parityCotCalc) parityCotCalc.textContent = res.parity.cotCalc;
     }
 
     // Render Step by Step School Explanation
@@ -767,6 +790,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Toggle Parity Mirror on Circle
+    if (toggleParityMirrorBtn) {
+        toggleParityMirrorBtn.addEventListener('click', () => {
+            if (!circleCanvas) return;
+            circleCanvas.showParityMirror = !circleCanvas.showParityMirror;
+            toggleParityMirrorBtn.classList.toggle('active', circleCanvas.showParityMirror);
+            circleCanvas.render();
+        });
+    }
+
     // Copy Solution to Clipboard (Single Angle or Series)
     if (copySolutionBtn) {
         copySolutionBtn.addEventListener('click', () => {
@@ -786,7 +819,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 text += `Угол на круге [0°, 360°): ${TrigEngine.formatDegree(res.normalizedDegrees)}\n`;
                 text += `Положение: ${res.quadrant.title} (${res.quadrant.desc || ''})\n`;
                 text += `Ближайшая засечка: ${res.nearestTickSummary}\n`;
-                text += `Значения: sin = ${res.trigValues.sinExact}, cos = ${res.trigValues.cosExact}, tg = ${res.trigValues.tanExact}, ctg = ${res.trigValues.cotExact}\n\n`;
+                text += `Значения: sin = ${res.trigValues.sinExact}, cos = ${res.trigValues.cosExact}, tg = ${res.trigValues.tanExact}, ctg = ${res.trigValues.cotExact}\n`;
+                if (res.parity) {
+                    text += `Чётность функций (f(-x)):\n`;
+                    text += `• ${res.parity.cosCalc} [чётная]\n`;
+                    text += `• ${res.parity.sinCalc} [нечётная]\n`;
+                    text += `• ${res.parity.tanCalc} [нечётная]\n`;
+                    text += `• ${res.parity.cotCalc} [нечётная]\n\n`;
+                } else {
+                    text += `\n`;
+                }
                 text += `Пошаговый школьный разбор:\n`;
 
                 res.steps.forEach(s => {

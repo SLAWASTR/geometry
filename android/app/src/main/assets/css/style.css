@@ -891,6 +891,159 @@ html, body {
     color: var(--accent-blue);
 }
 
+/* Parity of Trigonometric Functions Card */
+.parity-card {
+    padding: 12px 14px;
+    margin-bottom: 12px;
+}
+
+.parity-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.parity-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.parity-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.parity-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.15px;
+}
+
+.parity-subtitle {
+    font-size: 10px;
+    color: var(--text-tertiary);
+}
+
+.parity-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 7px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.parity-toggle-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    background: var(--card-bg);
+}
+
+.parity-toggle-btn.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 113, 227, 0.35);
+}
+
+.parity-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+@media (max-width: 480px) {
+    .parity-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.parity-item {
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 9px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    transition: all 0.15s ease;
+}
+
+.parity-item:hover {
+    border-color: rgba(0, 113, 227, 0.4);
+}
+
+.parity-item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.parity-formula {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.parity-badge {
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    padding: 2px 6px;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
+.badge-even {
+    background: rgba(52, 199, 89, 0.16);
+    color: #28cd41;
+}
+
+[data-theme="dark"] .badge-even {
+    background: rgba(48, 209, 88, 0.22);
+    color: #30d158;
+}
+
+.badge-odd {
+    background: rgba(0, 113, 227, 0.14);
+    color: var(--accent-blue);
+}
+
+[data-theme="dark"] .badge-odd {
+    background: rgba(10, 132, 255, 0.22);
+    color: #0a84ff;
+}
+
+.parity-calc {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--accent-blue);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.parity-hint {
+    font-size: 9.5px;
+    color: var(--text-tertiary);
+    line-height: 1.25;
+}
+
 /* Step-by-Step Educational Solution */
 .solution-section {
     padding: 14px 16px;

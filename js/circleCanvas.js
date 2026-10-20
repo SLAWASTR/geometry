@@ -10,6 +10,7 @@ class CircleCanvas {
         this.onAngleChange = onAngleChange;
         this.onAlphaChange = null;
         this.showAlphaReference = true;
+        this.showParityMirror = false;
         this.isDragging = false;
         this.result = null;
         this.logicalSize = 320;
@@ -166,6 +167,11 @@ class CircleCanvas {
 
             // 7. Projections to Axes (cos, sin)
             this.drawProjections(ctx, center, radius, this.result.normalizedDegrees, isDark);
+
+            // 7B. Parity Symmetry (-x on Circle)
+            if (this.showParityMirror) {
+                this.drawParitySymmetry(ctx, center, radius, this.result.normalizedDegrees, isDark);
+            }
 
             // 8. Terminal Ray (Contrasting orange with glowing endpoint)
             this.drawTerminalRay(ctx, center, radius, this.result.normalizedDegrees);
@@ -471,6 +477,71 @@ class CircleCanvas {
         ctx.arc(center, targetY, 2.5, 0, 2 * Math.PI);
         ctx.fillStyle = isDark ? '#30d158' : '#34c759';
         ctx.fill();
+
+        ctx.restore();
+    }
+
+    drawParitySymmetry(ctx, center, radius, normDeg, isDark) {
+        const rad = (normDeg * Math.PI) / 180.0;
+        const x0 = center + radius * Math.cos(rad);
+        const y0 = center - radius * Math.sin(rad);
+        const yNeg = center + radius * Math.sin(rad); // opposite y (reflection across Ox)
+
+        ctx.save();
+
+        const mirrorColor = isDark ? '#bf5af2' : '#af52de';
+        const chordColor = isDark ? 'rgba(191, 90, 242, 0.75)' : 'rgba(175, 82, 222, 0.7)';
+
+        // 1. Vertical Chord connecting P(x) and P(-x) (demonstrates identical x = cos(-x) = cos(x))
+        ctx.beginPath();
+        ctx.setLineDash([4, 3]);
+        ctx.lineWidth = 1.8;
+        ctx.strokeStyle = chordColor;
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x0, yNeg);
+        ctx.stroke();
+
+        // 2. Symmetric Ray to P(-x)
+        ctx.beginPath();
+        ctx.setLineDash([3, 3]);
+        ctx.lineWidth = 2.0;
+        ctx.strokeStyle = chordColor;
+        ctx.moveTo(center, center);
+        ctx.lineTo(x0, yNeg);
+        ctx.stroke();
+
+        // 3. Symmetric Endpoint P(-x)
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(x0, yNeg, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = mirrorColor;
+        ctx.fill();
+        ctx.lineWidth = 1.6;
+        ctx.strokeStyle = '#ffffff';
+        ctx.stroke();
+
+        // 4. Label P(-x)
+        ctx.font = 'bold 10px system-ui, -apple-system, sans-serif';
+        ctx.fillStyle = mirrorColor;
+        ctx.textAlign = x0 >= center ? 'left' : 'right';
+        ctx.textBaseline = yNeg >= center ? 'top' : 'bottom';
+        const offsetX = x0 >= center ? 7 : -7;
+        const offsetY = yNeg >= center ? 5 : -5;
+        ctx.fillText('P(−x)', x0 + offsetX, yNeg + offsetY);
+
+        // 5. cos(-x) = cos(x) indicator on Ox axis
+        if (Math.abs(Math.sin(rad)) > 0.15) {
+            ctx.beginPath();
+            ctx.arc(x0, center, 3, 0, 2 * Math.PI);
+            ctx.fillStyle = mirrorColor;
+            ctx.fill();
+
+            ctx.font = '600 9px system-ui, -apple-system, sans-serif';
+            ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.75)';
+            ctx.textAlign = 'center';
+            const textY = y0 < center ? center + 12 : center - 6;
+            ctx.fillText('cos(−x)=cos(x)', x0, textY);
+        }
 
         ctx.restore();
     }
