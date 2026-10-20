@@ -83,7 +83,7 @@ class TrigEngine {
             .replace(/ /g, '')
             .replace(/,/g, '.');
 
-        // Direct degrees e.g. 135°, -90°, 45град
+        // Direct degrees e.g. 135°, -90°, 45град or plain numbers like 135, -45, 300
         if (s.includes('°') || s.endsWith('град') || s.endsWith('deg')) {
             let numPart = s.replace(/°/g, '').replace(/град/g, '').replace(/deg/g, '');
             let degVal = parseFloat(numPart);
@@ -96,6 +96,22 @@ class TrigEngine {
                     denominatorExact: null,
                     radians: (degVal * Math.PI) / 180.0,
                     degrees: degVal
+                });
+            }
+        }
+
+        // Direct numbers without slash or pi (e.g. 135, -90, 45, 720) -> treat as degrees directly
+        if (!s.includes('/') && !s.includes('π')) {
+            let directDeg = parseFloat(s);
+            if (!isNaN(directDeg)) {
+                return this.buildResult({
+                    rawInput: input,
+                    hasPi: false,
+                    isFraction: false,
+                    numeratorExact: null,
+                    denominatorExact: null,
+                    radians: (directDeg * Math.PI) / 180.0,
+                    degrees: directDeg
                 });
             }
         }

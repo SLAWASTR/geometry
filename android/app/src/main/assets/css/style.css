@@ -702,6 +702,61 @@ html, body {
     color: var(--text-primary);
 }
 
+.degree-input-wrapper {
+    display: inline-flex;
+    align-items: center;
+    background: var(--card-bg);
+    border: 1.5px solid var(--input-border);
+    border-radius: 9px;
+    padding: 3px 6px 3px 8px;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    flex-shrink: 0;
+}
+
+.degree-input-wrapper:hover {
+    border-color: rgba(0, 113, 227, 0.5);
+}
+
+.degree-input-wrapper:focus-within {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px var(--accent-blue-subtle);
+    background: var(--card-bg);
+}
+
+.degree-input-field {
+    width: 60px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: right;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    -moz-appearance: textfield;
+}
+
+.degree-input-field::-webkit-outer-spin-button,
+.degree-input-field::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.degree-unit {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--accent-blue);
+    margin-left: 2px;
+    user-select: none;
+}
+
+.alpha-input-field {
+    width: 38px;
+    font-size: 12.5px;
+}
+
 .steppers-bar {
     display: flex;
     align-items: center;

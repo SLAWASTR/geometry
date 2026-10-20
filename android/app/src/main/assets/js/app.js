@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearSeriesBtn = document.getElementById('clearSeriesBtn');
     const alphaSlider = document.getElementById('alphaSlider');
     const alphaValueDisplay = document.getElementById('alphaValueDisplay');
+    const alphaInputField = document.getElementById('alphaInputField');
     const toggleAlphaRefBtn = document.getElementById('toggleAlphaRefBtn');
 
     // DOM Elements - Secondary Column Sections
@@ -65,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements - Slider & Steppers
     const slider = document.getElementById('angleSlider');
     const sliderValueDisplay = document.getElementById('sliderValueDisplay');
+    const degreeInputField = document.getElementById('degreeInputField');
     const stepperMinus360 = document.getElementById('stepperMinus360');
     const stepperMinus90 = document.getElementById('stepperMinus90');
     const stepperZero = document.getElementById('stepperZero');
@@ -107,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         circleCanvas.onAlphaChange = (newAlpha) => {
             seriesAlpha = newAlpha;
             if (alphaSlider) alphaSlider.value = newAlpha;
+            if (alphaInputField && document.activeElement !== alphaInputField) alphaInputField.value = newAlpha;
             if (alphaValueDisplay) alphaValueDisplay.textContent = `${newAlpha}°`;
             document.querySelectorAll('.alpha-chip').forEach(c => {
                 c.classList.toggle('active', parseInt(c.getAttribute('data-deg')) === newAlpha);
@@ -141,6 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (sliderValueDisplay) {
                 sliderValueDisplay.textContent = `${Math.round(result.degrees)}°`;
             }
+            if (degreeInputField && document.activeElement !== degreeInputField) {
+                degreeInputField.value = Math.round(result.degrees);
+            }
             if (errorBanner) {
                 errorBanner.classList.add('hidden');
             }
@@ -154,12 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Update application from degree number (e.g. slider, steppers, canvas touch)
+    // Update application from degree number (e.g. slider, steppers, canvas touch, manual input)
     function updateFromDegrees(deg) {
         deg = Math.max(-5000, Math.min(5000, deg));
         sliderDegrees = deg;
-        if (slider) slider.value = deg;
+        if (slider && document.activeElement !== slider) slider.value = deg;
         if (sliderValueDisplay) sliderValueDisplay.textContent = `${Math.round(deg)}°`;
+        if (degreeInputField && document.activeElement !== degreeInputField) degreeInputField.value = Math.round(deg);
 
         const degInt = Math.round(deg);
         const sign = degInt < 0 ? '-' : '';
@@ -364,6 +371,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (seriesInput && document.activeElement !== seriesInput) {
             seriesInput.value = seriesExpr;
         }
+        if (alphaSlider && document.activeElement !== alphaSlider) {
+            alphaSlider.value = seriesAlpha;
+        }
+        if (alphaInputField && document.activeElement !== alphaInputField) {
+            alphaInputField.value = seriesAlpha;
+        }
+        if (alphaValueDisplay) {
+            alphaValueDisplay.textContent = `${seriesAlpha}°`;
+        }
 
         const res = TrigEngine.calculateSeries(seriesExpr, seriesAlpha);
         currentSeriesResult = res;
@@ -515,10 +531,54 @@ document.addEventListener('DOMContentLoaded', () => {
             const deg = parseInt(e.target.value);
             seriesAlpha = deg;
             if (alphaValueDisplay) alphaValueDisplay.textContent = `${deg}°`;
+            if (alphaInputField && document.activeElement !== alphaInputField) alphaInputField.value = deg;
             document.querySelectorAll('.alpha-chip').forEach(c => {
                 c.classList.toggle('active', parseInt(c.getAttribute('data-deg')) === deg);
             });
             updateSeries(seriesExpr, seriesAlpha);
+        });
+    }
+
+    if (alphaInputField) {
+        alphaInputField.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            if (!isNaN(val)) {
+                const deg = Math.max(1, Math.min(89, Math.round(val)));
+                seriesAlpha = deg;
+                if (alphaSlider) alphaSlider.value = deg;
+                if (alphaValueDisplay) alphaValueDisplay.textContent = `${deg}°`;
+                document.querySelectorAll('.alpha-chip').forEach(c => {
+                    c.classList.toggle('active', parseInt(c.getAttribute('data-deg')) === deg);
+                });
+                updateSeries(seriesExpr, seriesAlpha);
+            }
+        });
+        alphaInputField.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                const step = e.shiftKey ? 5 : 1;
+                const next = Math.min(89, seriesAlpha + step);
+                seriesAlpha = next;
+                if (alphaSlider) alphaSlider.value = next;
+                alphaInputField.value = next;
+                if (alphaValueDisplay) alphaValueDisplay.textContent = `${next}°`;
+                document.querySelectorAll('.alpha-chip').forEach(c => {
+                    c.classList.toggle('active', parseInt(c.getAttribute('data-deg')) === next);
+                });
+                updateSeries(seriesExpr, seriesAlpha);
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const step = e.shiftKey ? 5 : 1;
+                const next = Math.max(1, seriesAlpha - step);
+                seriesAlpha = next;
+                if (alphaSlider) alphaSlider.value = next;
+                alphaInputField.value = next;
+                if (alphaValueDisplay) alphaValueDisplay.textContent = `${next}°`;
+                document.querySelectorAll('.alpha-chip').forEach(c => {
+                    c.classList.toggle('active', parseInt(c.getAttribute('data-deg')) === next);
+                });
+                updateSeries(seriesExpr, seriesAlpha);
+            }
         });
     }
 
@@ -528,6 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
             seriesAlpha = deg;
             if (alphaSlider) alphaSlider.value = deg;
             if (alphaValueDisplay) alphaValueDisplay.textContent = `${deg}°`;
+            if (alphaInputField) alphaInputField.value = deg;
             document.querySelectorAll('.alpha-chip').forEach(c => c.classList.remove('active'));
             chip.classList.add('active');
             updateSeries(seriesExpr, seriesAlpha);
@@ -624,10 +685,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Angle Slider
+    // Angle Slider & Direct Degree Input
     if (slider) {
         slider.addEventListener('input', (e) => {
             updateFromDegrees(parseFloat(e.target.value));
+        });
+    }
+
+    if (degreeInputField) {
+        degreeInputField.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            if (!isNaN(val)) {
+                updateFromDegrees(val);
+            }
+        });
+        degreeInputField.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                const step = e.shiftKey ? 15 : 1;
+                updateFromDegrees(sliderDegrees + step);
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const step = e.shiftKey ? 15 : 1;
+                updateFromDegrees(sliderDegrees - step);
+            } else if (e.key === 'Enter') {
+                degreeInputField.blur();
+            }
         });
     }
 
@@ -646,12 +729,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 seriesAlpha = 35;
                 if (seriesInput) seriesInput.value = seriesExpr;
                 if (alphaSlider) alphaSlider.value = 35;
+                if (alphaInputField) alphaInputField.value = 35;
                 if (alphaValueDisplay) alphaValueDisplay.textContent = '35°';
                 document.querySelectorAll('.series-task-pill').forEach((p, idx) => p.classList.toggle('active', idx === 0));
                 document.querySelectorAll('.mini-task-chip').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.alpha-chip').forEach(c => c.classList.toggle('active', c.getAttribute('data-deg') === '35'));
                 updateSeries(seriesExpr, seriesAlpha);
             } else {
+                if (degreeInputField) degreeInputField.value = 0;
                 updateFromDegrees(0);
             }
         });

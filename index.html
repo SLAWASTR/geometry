@@ -157,7 +157,10 @@
                         <div class="alpha-control-box">
                             <div class="alpha-control-header">
                                 <span class="alpha-label">Опорный угол <b>α</b> (I четверть):</span>
-                                <span id="alphaValueDisplay" class="alpha-badge">35°</span>
+                                <div class="degree-input-wrapper" title="Ввести угол α вручную в градусах">
+                                    <input type="number" id="alphaInputField" class="degree-input-field alpha-input-field" min="1" max="89" step="1" value="35">
+                                    <span class="degree-unit">°</span>
+                                </div>
                             </div>
                             <div class="alpha-slider-row">
                                 <input type="range" id="alphaSlider" class="app-range-slider" min="15" max="75" step="1" value="35">
@@ -208,8 +211,11 @@
                     <div class="controls-panel">
                         <div class="slider-box">
                             <span class="control-icon">🧭</span>
-                            <input type="range" id="angleSlider" class="app-range-slider" min="-5000" max="5000" step="5" value="135">
-                            <div id="sliderValueDisplay" class="slider-badge">135°</div>
+                            <input type="range" id="angleSlider" class="app-range-slider" min="-5000" max="5000" step="1" value="135">
+                            <div class="degree-input-wrapper" title="Ввести градусы угла вручную">
+                                <input type="number" id="degreeInputField" class="degree-input-field" min="-5000" max="5000" step="1" value="135">
+                                <span class="degree-unit">°</span>
+                            </div>
                         </div>
 
                         <div class="steppers-bar">
